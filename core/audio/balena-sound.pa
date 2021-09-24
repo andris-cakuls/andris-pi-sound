@@ -12,6 +12,5 @@ load-module module-null-sink sink_name=snapcast
 load-module module-loopback latency_msec=%INPUT_LATENCY% source="balena-sound.input.monitor" %INPUT_SINK%
 load-module module-loopback latency_msec=%OUTPUT_LATENCY% source="balena-sound.output.monitor" %OUTPUT_SINK%
 
-
 # Route all plugin input to the default sink
 set-default-sink balena-sound.input
