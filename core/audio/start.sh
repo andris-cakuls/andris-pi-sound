@@ -63,7 +63,7 @@ function route_output_sink() {
   sed -i "s/%OUTPUT_SINK%/sink=\"$OUTPUT\"/" "$CONFIG_FILE"
   echo "Routing 'balena-sound.output' to '$OUTPUT'."
 
-  if [[ "${AUDIO_OUTPUT:-}" -eq "balena-sound.all" ]]; do
+  if [[ "${AUDIO_OUTPUT:-}" -eq "balena-sound.all" ]]; then
     echo "Routing balena-sound.all to all devices"
 
     BCM2835_CARDS=($(cat /proc/asound/cards | mawk -F '\[|\]:' '/bcm2835/ && NR%2==1 {gsub(/ /, "", $0); print $2}'))
