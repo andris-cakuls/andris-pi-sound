@@ -1,4 +1,4 @@
-name: balenaSound
+name: andris-balenaSound
 type: sw.application
 description: >-
   Build a single or multi-room streamer for an existing audio device using a
@@ -28,15 +28,15 @@ assets:
   repository:
     type: blob.asset
     data:
-      url: 'https://github.com/balenalabs/balena-sound'
+      url: 'https://github.com/andris-cakuls/andris-pi-sound'
   logo:
     type: blob.asset
     data:
       url: >-
-        https://raw.githubusercontent.com/balenalabs/balena-sound/master/logo.png
+        https://raw.githubusercontent.com/andris-cakuls/andris-pi-sound/master/logo.png
 data:
   applicationEnvironmentVariables:
-    - SOUND_VOLUME: 75
+    - AUDIO_VOLUME: 95
     - AUDIO_OUTPUT: AUTO
   defaultDeviceType: raspberry-pi
   supportedDeviceTypes:

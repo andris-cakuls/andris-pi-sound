@@ -62,6 +62,27 @@ function route_output_sink() {
   OUTPUT="${OUTPUT:-0}"
   sed -i "s/%OUTPUT_SINK%/sink=\"$OUTPUT\"/" "$CONFIG_FILE"
   echo "Routing 'balena-sound.output' to '$OUTPUT'."
+
+  if [[ "${AUDIO_OUTPUT:-}" -eq "balena-sound.all" ]]; do
+    echo "Routing balena-sound.all to all devices"
+
+    BCM2835_CARDS=($(cat /proc/asound/cards | mawk -F '\[|\]:' '/bcm2835/ && NR%2==1 {gsub(/ /, "", $0); print $2}'))
+    USB_CARDS=($(cat /proc/asound/cards | mawk -F '\[|\]:' '/usb/ && NR%2==1 {gsub(/ /, "", $0); print $2}'))
+    DAC_CARD=$(cat /proc/asound/cards | mawk -F '\[|\]:' '/dac|DAC|Dac/ && NR%2==1 {gsub(/ /, "", $0); print $2}')
+
+    for sound_card in "${USB_CARDS[@]}"; do
+      echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.$sound_card.analog-stereo\"" >> "$CONFIG_FILE"
+    done;
+
+    echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.${DAC_CARD}.stereo-fallback\"" >> "$CONFIG_FILE"
+    
+    if [[ "${BCM2835_CARDS[@]}" =~ "bcm2835-alsa" ]]; then
+      echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-alsa.stereo-fallback\"" >> "$CONFIG_FILE"
+    else
+      echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-jack.stereo-fallback\"" >> "$CONFIG_FILE"
+    fi
+
+  fi
 }
 
 function reset_sound_config() {
