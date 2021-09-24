@@ -10,7 +10,7 @@ function set_loopback_latency() {
   local LOOPBACK="$1"
   local LATENCY="$2"
   
-  sed -i "s/%$LOOPBACK%/$LATENCY/" "$CONFIG_FILE"
+  sed -i "s/%$LOOPBACK%/$LATENCY/g" "$CONFIG_FILE"
 }
 
 # Route "balena-sound.input" to the appropriate sink depending on selected mode
@@ -70,16 +70,21 @@ function route_output_sink() {
     USB_CARDS=($(cat /proc/asound/cards | mawk -F '\[|\]:' '/usb/ && NR%2==1 {gsub(/ /, "", $0); print $2}'))
     DAC_CARD=$(cat /proc/asound/cards | mawk -F '\[|\]:' '/dac|DAC|Dac/ && NR%2==1 {gsub(/ /, "", $0); print $2}')
 
+    echo -e "\n\n" >> "$CONFIG_FILE"
     for sound_card in "${USB_CARDS[@]}"; do
-      echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.$sound_card.analog-stereo\"" >> "$CONFIG_FILE"
+      echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.$sound_card.analog-stereo\"" >> "$CONFIG_FILE"
+      echo -e "set-sink-volume \"alsa_output.$sound_card.analog-stereo\" 32768" >> "$CONFIG_FILE"
     done;
 
-    echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.${DAC_CARD}.stereo-fallback\"" >> "$CONFIG_FILE"
+    echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.${DAC_CARD}.stereo-fallback\"" >> "$CONFIG_FILE"
+    echo -e "set-sink-volume \"alsa_output.${DAC_CARD}.stereo-fallback\" 32768" >> "$CONFIG_FILE"
     
     if [[ "${BCM2835_CARDS[@]}" =~ "bcm2835-alsa" ]]; then
-      echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-alsa.stereo-fallback\"" >> "$CONFIG_FILE"
+      echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-alsa.stereo-fallback\"" >> "$CONFIG_FILE"
+      echo -e "set-sink-volume \"alsa_output.bcm2835-alsa.stereo-fallback\" 56210" >> "$CONFIG_FILE"
     else
-      echo -e "\nload-module module-loopback source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-jack.stereo-fallback\"" >> "$CONFIG_FILE"
+      echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-jack.stereo-fallback\"" >> "$CONFIG_FILE"
+      echo -e "set-sink-volume \"alsa_output.bcm2835-jack.stereo-fallback\" 56210" >> "$CONFIG_FILE"
     fi
 
   fi
