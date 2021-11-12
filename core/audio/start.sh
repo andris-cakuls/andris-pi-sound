@@ -73,18 +73,18 @@ function route_output_sink() {
     echo -e "\n\n" >> "$CONFIG_FILE"
     for sound_card in "${USB_CARDS[@]}"; do
       echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.$sound_card.analog-stereo\"" >> "$CONFIG_FILE"
-      echo -e "set-sink-volume alsa_output.$sound_card.analog-stereo 32768" >> "$CONFIG_FILE"
+      echo -e "set-sink-volume alsa_output.$sound_card.analog-stereo 55000" >> "$CONFIG_FILE"
     done;
 
     echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.${DAC_CARD}.stereo-fallback\"" >> "$CONFIG_FILE"
-    echo -e "set-sink-volume alsa_output.${DAC_CARD}.stereo-fallback 32768" >> "$CONFIG_FILE"
+    echo -e "set-sink-volume alsa_output.${DAC_CARD}.stereo-fallback 55000" >> "$CONFIG_FILE"
     
     if [[ "${BCM2835_CARDS[@]}" =~ "bcm2835-alsa" ]]; then
       echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-alsa.stereo-fallback\"" >> "$CONFIG_FILE"
-      echo -e "set-sink-volume alsa_output.bcm2835-alsa.stereo-fallback 56210" >> "$CONFIG_FILE"
+      echo -e "set-sink-volume alsa_output.bcm2835-alsa.stereo-fallback 60000" >> "$CONFIG_FILE"
     else
       echo -e "load-module module-loopback latency_msec=%OUTPUT_LATENCY% source=\"balena-sound.all.monitor\" sink=\"alsa_output.bcm2835-jack.stereo-fallback\"" >> "$CONFIG_FILE"
-      echo -e "set-sink-volume alsa_output.bcm2835-jack.stereo-fallback 56210" >> "$CONFIG_FILE"
+      echo -e "set-sink-volume alsa_output.bcm2835-jack.stereo-fallback 60000" >> "$CONFIG_FILE"
     fi
 
   fi
